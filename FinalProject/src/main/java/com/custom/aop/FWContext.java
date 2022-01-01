@@ -58,7 +58,7 @@ public class FWContext {
 					for (Constructor<?> constructor : serviceClass.getConstructors()) {
 						if (constructor.isAnnotationPresent(Autowired.class)) {
 							for (Class<?> clazzType : constructor.getParameterTypes()) {
-								Object instance = getServiceBeanOftype(clazzType);
+								Object instance = getServiceBeanOftype(clazzType, null);
 								Object instanceService = (Object) constructor.newInstance(instance);
 								this.injectFieldType(serviceClass, instanceService);
 								serviceObjectMap.add(instanceService);
@@ -82,7 +82,10 @@ public class FWContext {
 					// get the type of the field
 					Class<?> theFieldType = field.getType();
 					// get the object instance of this type
-					Object instance = getServiceBeanOftype(theFieldType);
+					Object instance = getServiceBeanOftype(theFieldType, null);
+					if(field.isAnnotationPresent(Qualifier.class)) {
+						instance = getServiceBeanOftype(theFieldType, field.getAnnotation(Qualifier.class).value());
+					}
 					// do the injection
 					field.setAccessible(true);
 					field.set(application, instance);
@@ -111,7 +114,10 @@ public class FWContext {
 						// get the type of the field
 						Class<?> theFieldType = field.getType();
 						// get the object instance of this type
-						Object instance = getServiceBeanOftype(theFieldType);
+						Object instance = getServiceBeanOftype(theFieldType, null);
+						if(field.isAnnotationPresent(Qualifier.class)) {
+							instance = getServiceBeanOftype(theFieldType, field.getAnnotation(Qualifier.class).value());
+						}
 						// do the injection
 						field.setAccessible(true);
 						field.set(theTestClass, instance);
@@ -140,27 +146,42 @@ public class FWContext {
 		}
 	}
 
-	public Object getServiceBeanOftype(Class interfaceClass) {
+	public Object getServiceBeanOftype(Class interfaceClass, String qualifier) {
 		Object service = null;
 		try {
 			for (Object theClass : serviceObjectMap) {
 				Class<?>[] interfaces = theClass.getClass().getInterfaces();
-
-				for (Class<?> theInterface : interfaces) {
-					if (theInterface.getName().contentEquals(interfaceClass.getName()))
-						service = theClass;
-				}
-			}
-			for (Object theClass : repositoryObjectMap) {
-				Class<?>[] interfaces = theClass.getClass().getInterfaces();
-
 				for (Class<?> theInterface : interfaces) {
 					if (theInterface.getName().contentEquals(interfaceClass.getName())) {
 						if(theClass.getClass().isAnnotationPresent(Profile.class) &&
 								this.checkProfileAnnotation(theClass)) {
-							service = theClass;
+							return theClass;
 						} else {
-							service = theClass;
+							if(qualifier != null && theClass.getClass().getSimpleName().equalsIgnoreCase(qualifier)) {
+								return theClass;
+							} else {
+								service = theClass;
+							}
+							
+						}
+						
+					}
+				}
+			}
+			for (Object theClass : repositoryObjectMap) {
+				Class<?>[] interfaces = theClass.getClass().getInterfaces();
+				for (Class<?> theInterface : interfaces) {
+					if (theInterface.getName().contentEquals(interfaceClass.getName())) {
+						if(theClass.getClass().isAnnotationPresent(Profile.class) &&
+								this.checkProfileAnnotation(theClass)) {
+							return theClass;
+						} else {
+							if(qualifier != null && theClass.getClass().getSimpleName().equalsIgnoreCase(qualifier)) {
+								return theClass;
+							} else {
+								service = theClass;
+							}
+							
 						}
 						
 					}
@@ -231,7 +252,7 @@ public class FWContext {
 			// get the type of the field
 			Class<?> theFieldType = field.getType();
 			// get the object instance of this type
-			Object instance = getServiceBeanOftype(theFieldType);
+			Object instance = getServiceBeanOftype(theFieldType, null);
 			// do the injection
 			field.setAccessible(true);
 			field.set(instanceService, instance);
@@ -296,7 +317,7 @@ public class FWContext {
 	private List<Object> getParamsAnnotation(Method method) {
 		List<Object> objectParams = new ArrayList<Object>();
 		for (Class<?> clazzType : method.getParameterTypes()) {
-			Object instance = getServiceBeanOftype(clazzType);
+			Object instance = getServiceBeanOftype(clazzType, null);
 			objectParams.add(instance);
 		}
 		return objectParams;

@@ -10,11 +10,12 @@ import java.util.Map;
 public class MyCategoryDAO1 implements IMyCategoryDAO {
     private Map<Integer, Category> categories = new HashMap<Integer, Category>();
     public Category find(int id){
-        System.out.println("Use MyCategoryDAO1");
         return categories.get(id);
     }
     public void save(Category category){
+    	System.out.println("Use MyCategoryDAO1");
         categories.put(category.getId(), category);
         System.out.println("New category: " + category);
+        
     }
 }
