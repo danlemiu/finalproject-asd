@@ -32,6 +32,27 @@ public class FWContext {
 		}
 	}
 	
+//	private void performDI() {
+//		try {
+//			for (Object theServiceClass : serviceObjectMap) {
+//		         // find annotated fields
+//				 for (Field field : theTestClass.getClass().getDeclaredFields()) {
+//			            if (field.isAnnotationPresent(Inject.class)) {
+//			                // get the type of the field
+//			            	Class<?> theFieldType =field.getType();
+//			            	//get the object instance of this type
+//			            	Object instance = getServiceBeanOftype(theFieldType);
+//			            	//do the injection
+//			            	field.setAccessible(true);
+//			            	field.set(theTestClass, instance);
+//			            }
+//			        }
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
+	
 	public void start() {
 		try {
 			for(Object serviceClass: serviceObjectMap) {
