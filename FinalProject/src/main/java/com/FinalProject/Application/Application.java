@@ -9,27 +9,24 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 
-@SpringBootApplication
 @ComponentScan("com.FinalProject")
-public class Application implements CommandLineRunner {
+public class Application {
     @Autowired
     ITransactionService transactionService;
     @Autowired
     ICategoryService categoryService;
+    @Autowired
+    IEmailSender emailSender;
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        
     }
 
-    @Override
     public void run(String... args) throws Exception {
-
-
 
         categoryService.addCategory(001, "car");
 
         Category car = categoryService.getCategory(001);
-
 
 
         transactionService.addTransaction(123,"Transaction1",90.00, car);
@@ -40,7 +37,7 @@ public class Application implements CommandLineRunner {
         Transaction transaction2 = transactionService.getTransaction(124);
 
         System.out.println("Transaction: " + transaction1);
-
+        emailSender.sendEmail();
 
 
     }
