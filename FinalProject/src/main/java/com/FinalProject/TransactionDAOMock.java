@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Repository
-@Profile("production")
-public class TransactionDAO implements ITransactionDAO{
+@Profile("Test")
+public class TransactionDAOMock implements ITransactionDAO{
     private Map<Integer, Transaction> transactions = new HashMap<Integer, Transaction>();
 
     public void save(Transaction transaction){
@@ -16,7 +16,7 @@ public class TransactionDAO implements ITransactionDAO{
     }
 
     public Transaction find(int id){
-        System.out.println("Transaction production");
+        System.out.println("Transaction test");
         return transactions.get(id);
     }
 
