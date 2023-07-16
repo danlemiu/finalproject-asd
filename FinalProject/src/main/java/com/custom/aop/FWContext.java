@@ -278,7 +278,17 @@ public class FWContext {
 				}
 			}
 		};   
+		int fixedRate = method.getAnnotation(Scheduled.class).fixedRate();
+		String cron = method.getAnnotation(Scheduled.class).cron();
 		
-		ScheduledFuture<?> result = executor.scheduleWithFixedDelay(task, 0, 1, TimeUnit.SECONDS);
+		if(!"".equals(cron)) {
+			String[] value = cron.split(" ");
+			int timeRate = Integer.parseInt(value[0]) + Integer.parseInt(value[1]) * 60;
+			executor.scheduleWithFixedDelay(task, 0, timeRate, TimeUnit.SECONDS);
+		} else {
+			executor.scheduleWithFixedDelay(task, 0, fixedRate, TimeUnit.MILLISECONDS);
+		}
+		
+		
 	}
 }

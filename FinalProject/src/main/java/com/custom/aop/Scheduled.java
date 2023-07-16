@@ -9,4 +9,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Scheduled {
 	public int fixedRate() default 1000;
+	public String cron() default "";
 }
