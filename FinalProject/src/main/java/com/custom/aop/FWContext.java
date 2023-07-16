@@ -26,7 +26,7 @@ public class FWContext {
 	
 	public FWContext(Object application) {
 		try {
-			Reflections reflections = new Reflections("");
+			Reflections reflections = new Reflections("com.FinalProject");
 
 			// find and instantiate all classes annotated with the @Service annotation
 			Set<Class<?>> customServicetypes = reflections.getTypesAnnotatedWith(CustomService.class);

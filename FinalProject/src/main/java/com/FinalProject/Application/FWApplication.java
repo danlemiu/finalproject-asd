@@ -16,6 +16,9 @@ import com.custom.aop.FWContext;
 @Configuration
 @ComponentScan("com.FinalProject")
 public class FWApplication {
+	public static void main(String[] args) {
+		new FWContext(null);
+	}
     public static void run(Class<?> clazz, String[] args) {
     	Object instance;
 		try {

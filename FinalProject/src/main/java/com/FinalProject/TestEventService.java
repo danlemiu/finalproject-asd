@@ -1,6 +1,7 @@
-package com.custom.aop;
+package com.FinalProject;
 
-import com.FinalProject.NewTransactionEvent;
+import com.custom.aop.EventListener;
+import com.custom.aop.EventService;
 
 @EventService
 public class TestEventService {
