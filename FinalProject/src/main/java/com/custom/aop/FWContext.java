@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -30,6 +31,7 @@ public class FWContext {
 	private static List<Object> serviceObjectMap = new ArrayList<>();
 	private static List<Object> repositoryObjectMap = new ArrayList<>();
 	private static String profile=null;
+	private ExecutorService executor = Executors.newFixedThreadPool(100);
 	
 	public FWContext(Object application) {
 		try {
@@ -124,15 +126,15 @@ public class FWContext {
 				// find all methods annotated with the @Autowired annotation
 				for (Method method : theTestClass.getClass().getDeclaredMethods()) {
 					if (method.isAnnotationPresent(Autowired.class)) {
-						List<Object> objectParams = new ArrayList<Object>();
-						for (Class<?> clazzType : method.getParameterTypes()) {
-							Object instance = getServiceBeanOftype(clazzType);
-							objectParams.add(instance);
-						}
+						List<Object> objectParams = this.getParamsAnnotation(method);
 						method.invoke(theTestClass, objectParams.toArray());
 					}
 					if (method.isAnnotationPresent(Scheduled.class)) {
 						this.createScheduling(method, theTestClass);
+					}
+					if(method.isAnnotationPresent(Async.class) && method.isAnnotationPresent(EventListener.class)) {
+						List<Object> objectParams = this.getParamsAnnotation(method);
+						this.createAsyncThread(method, objectParams, theTestClass);
 					}
 				}
 
@@ -262,9 +264,8 @@ public class FWContext {
 	}
 	
 	private void createScheduling(Method method, Object object) {
+		
 		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-
-		// then, when you want to schedule a task
 		Runnable task = new Runnable() {
 			
 			@Override
@@ -281,6 +282,7 @@ public class FWContext {
 		int fixedRate = method.getAnnotation(Scheduled.class).fixedRate();
 		String cron = method.getAnnotation(Scheduled.class).cron();
 		
+		
 		if(!"".equals(cron)) {
 			String[] value = cron.split(" ");
 			int timeRate = Integer.parseInt(value[0]) + Integer.parseInt(value[1]) * 60;
@@ -288,7 +290,32 @@ public class FWContext {
 		} else {
 			executor.scheduleWithFixedDelay(task, 0, fixedRate, TimeUnit.MILLISECONDS);
 		}
-		
-		
+	}
+	
+	private void createAsyncThread(Method method, List<Object> params, Object object) {
+		Runnable task = new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					method.invoke(object, params.toArray());
+				} catch (IllegalAccessException e) {
+					return;
+				} catch (InvocationTargetException e) {
+					return;
+				}
+			}
+		};
+		System.out.println("The task: " + method.getName() +" is running on threadpool " + executor.hashCode());
+		executor.submit(task);
+	}
+	
+	private List<Object> getParamsAnnotation(Method method) {
+		List<Object> objectParams = new ArrayList<Object>();
+		for (Class<?> clazzType : method.getParameterTypes()) {
+			Object instance = getServiceBeanOftype(clazzType);
+			objectParams.add(instance);
+		}
+		return objectParams;
 	}
 }

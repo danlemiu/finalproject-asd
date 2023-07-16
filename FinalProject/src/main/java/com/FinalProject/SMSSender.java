@@ -1,12 +1,11 @@
 package com.FinalProject;
 
 import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
+import com.custom.aop.Async;
+
 @Service
-@EnableAsync
 public class SMSSender {
     @Async
     @EventListener

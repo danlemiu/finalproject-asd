@@ -12,6 +12,7 @@ import com.FinalProject.IApplicationEventPublisher;
 import com.FinalProject.ITransactionDAO;
 import com.FinalProject.NewTransactionEvent;
 import com.FinalProject.Transaction;
+import com.custom.aop.Async;
 import com.custom.aop.EventListener;
 import com.custom.aop.Scheduled;
 
@@ -32,23 +33,23 @@ public class MyTransactionService implements IMyTransactionService {
 		publisher.publishEvent(new NewTransactionEvent(trans));
 	}
 	
-	@Scheduled(fixedRate=5000)
-	public void welcome() {
-		Date date = Calendar.getInstance().getTime();
-        DateFormat timeFormatter = DateFormat.getTimeInstance(DateFormat.DEFAULT);String currenttime = timeFormatter.format(date);
-        System.out.println("This task runs at " + currenttime);
-	}
+//	@Scheduled(fixedRate=5000)
+//	public void welcome() {
+//		Date date = Calendar.getInstance().getTime();
+//        DateFormat timeFormatter = DateFormat.getTimeInstance(DateFormat.DEFAULT);String currenttime = timeFormatter.format(date);
+//        System.out.println("This task runs at " + currenttime);
+//	}
+//	
+//	@Scheduled(cron="1 0")
+//	public void welcomeCron() {
+//		Date date = Calendar.getInstance().getTime();
+//        DateFormat timeFormatter = DateFormat.getTimeInstance(DateFormat.DEFAULT);String currenttime = timeFormatter.format(date);
+//        System.out.println("This cron task runs at " + currenttime);
+//	}
 	
-	@Scheduled(cron="1 0")
-	public void welcomeCron() {
-		Date date = Calendar.getInstance().getTime();
-        DateFormat timeFormatter = DateFormat.getTimeInstance(DateFormat.DEFAULT);String currenttime = timeFormatter.format(date);
-        System.out.println("This cron task runs at " + currenttime);
-	}
-	
+	@Async
 	@EventListener
 	public void receiveMessage(NewTransactionEvent event) {
 		System.out.println("Receive Transaction event: " + event.getTransaction().getName());
 	}
-	
 }

@@ -23,9 +23,15 @@ public class Application implements Runnable {
 
 	@Override
 	public void run() {
-		System.out.println("Application started!");
-		myTransactionService.addTransaction();
-		
+		for(int i= 0; i < 8; i++) {
+			try {
+				myTransactionService.addTransaction();
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 }
