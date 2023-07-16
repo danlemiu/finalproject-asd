@@ -12,6 +12,7 @@ public class TransactionDAO implements ITransactionDAO{
     private Map<Integer, Transaction> transactions = new HashMap<Integer, Transaction>();
 
     public void save(Transaction transaction){
+    	System.out.println("Add new Transaction: " + transaction.getName() + " - Amount: " + transaction.getAmount() );
         transactions.put(transaction.getId(), transaction);
     }
 

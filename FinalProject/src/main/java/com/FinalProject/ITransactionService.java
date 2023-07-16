@@ -2,7 +2,6 @@ package com.FinalProject;
 
 import org.springframework.stereotype.Service;
 
-@Service
 public interface ITransactionService {
     public void setTransactionDAO(ITransactionDAO transactionDAO);
     public void addTransaction(int id, String name, double amount, Category category);

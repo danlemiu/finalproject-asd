@@ -1,13 +1,11 @@
 package com.FinalProject;
 
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
-
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
+import org.springframework.stereotype.Repository;
+
+@Repository
 public class CategoryDAO implements ICategoryDAO {
     private Map<Integer, Category> categories = new HashMap<Integer, Category>();
 
