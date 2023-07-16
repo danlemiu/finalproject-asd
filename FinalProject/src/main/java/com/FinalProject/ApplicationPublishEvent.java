@@ -32,7 +32,7 @@ public class ApplicationPublishEvent implements IApplicationEventPublisher {
 						Object instance;
 						try {
 							instance = (Object)clazz.newInstance();
-							if(method.isAnnotationPresent(Async.class) && method.isAnnotationPresent(EventListener.class)) {
+							if(method.isAnnotationPresent(Async.class)) {
 								this.createAsyncThread(method, event, instance);
 							}
 						} catch (InstantiationException e) {

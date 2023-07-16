@@ -132,10 +132,6 @@ public class FWContext {
 					if (method.isAnnotationPresent(Scheduled.class)) {
 						this.createScheduling(method, theTestClass);
 					}
-					if(method.isAnnotationPresent(Async.class) && method.isAnnotationPresent(EventListener.class)) {
-						List<Object> objectParams = this.getParamsAnnotation(method);
-						this.createAsyncThread(method, objectParams, theTestClass);
-					}
 				}
 
 			}
@@ -295,24 +291,6 @@ public class FWContext {
 		} else {
 			executor.scheduleWithFixedDelay(task, 0, fixedRate, TimeUnit.MILLISECONDS);
 		}
-	}
-	
-	private void createAsyncThread(Method method, List<Object> params, Object object) {
-		Runnable task = new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					method.invoke(object, params.toArray());
-				} catch (IllegalAccessException e) {
-					return;
-				} catch (InvocationTargetException e) {
-					return;
-				}
-			}
-		};
-		System.out.println("The task: " + method.getName() +" is running on threadpool " + executor.hashCode());
-		executor.submit(task);
 	}
 	
 	private List<Object> getParamsAnnotation(Method method) {
