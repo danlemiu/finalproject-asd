@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
+@Repository
 public class MyCategoryDAO implements ICategoryDAO {
     private Map<Integer, Category> categories = new HashMap<Integer, Category>();
 
