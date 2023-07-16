@@ -3,11 +3,14 @@ package com.custom.aop;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -24,9 +27,10 @@ public class FWContext {
 	private static List<Object> serviceObjectMap = new ArrayList<>();
 	private static List<Object> repositoryObjectMap = new ArrayList<>();
 	
+	
 	public FWContext(Object application) {
 		try {
-			Reflections reflections = new Reflections("com.FinalProject");
+			Reflections reflections = new Reflections("");
 
 			// find and instantiate all classes annotated with the @Service annotation
 			Set<Class<?>> customServicetypes = reflections.getTypesAnnotatedWith(CustomService.class);
@@ -39,7 +43,7 @@ public class FWContext {
 			for (Class<?> serviceClass : repositorytypes) {
 				repositoryObjectMap.add((Object) serviceClass.newInstance());
 			}
-
+			
 			// find and instantiate all classes annotated with the @Service annotation
 			Set<Class<?>> servicetypes = reflections.getTypesAnnotatedWith(Service.class);
 			for (Class<?> serviceClass : servicetypes) {
@@ -146,8 +150,11 @@ public class FWContext {
 				Class<?>[] interfaces = theClass.getClass().getInterfaces();
 
 				for (Class<?> theInterface : interfaces) {
-					if (theInterface.getName().contentEquals(interfaceClass.getName()))
+					if (theInterface.getName().contentEquals(interfaceClass.getName())) {
+						//this.getProfileAnnotation(theClass);
 						service = theClass;
+					}
+						
 				}
 			}
 		} catch (Exception e) {
@@ -235,5 +242,17 @@ public class FWContext {
 		} catch (IOException e) {
 			return null;
 		}
+	}
+	
+	private Annotation getProfileAnnotation(Object clazz) {
+		String key= this.getValueFromApplicationProperties("spring.profiles.active");
+		//String profile = this.profileClasses.get(key);
+		for(Annotation annotation: clazz.getClass().getAnnotations()) {
+			if(annotation.annotationType().getSimpleName().indexOf(key) >= 0) {
+				System.out.println(1111);
+				return null;
+			}
+		}
+		return null;
 	}
 }
