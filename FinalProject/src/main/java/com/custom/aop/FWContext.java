@@ -159,9 +159,14 @@ public class FWContext {
 				Class<?>[] interfaces = theClass.getClass().getInterfaces();
 
 				for (Class<?> theInterface : interfaces) {
-					if (theInterface.getName().contentEquals(interfaceClass.getName()) &&
-							this.checkProfileAnnotation(theClass)) {
-						service = theClass;
+					if (theInterface.getName().contentEquals(interfaceClass.getName())) {
+						if(theClass.getClass().isAnnotationPresent(Profile.class) &&
+								this.checkProfileAnnotation(theClass)) {
+							service = theClass;
+						} else {
+							service = theClass;
+						}
+						
 					}
 						
 				}
