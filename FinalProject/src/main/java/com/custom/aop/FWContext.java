@@ -26,11 +26,12 @@ public class FWContext {
 
 	private static List<Object> serviceObjectMap = new ArrayList<>();
 	private static List<Object> repositoryObjectMap = new ArrayList<>();
-	
+	private static String profile=null;
 	
 	public FWContext(Object application) {
 		try {
 			Reflections reflections = new Reflections("");
+			profile= this.getValueFromApplicationProperties("spring.profiles.active");
 
 			// find and instantiate all classes annotated with the @Service annotation
 			Set<Class<?>> customServicetypes = reflections.getTypesAnnotatedWith(CustomService.class);
@@ -150,8 +151,8 @@ public class FWContext {
 				Class<?>[] interfaces = theClass.getClass().getInterfaces();
 
 				for (Class<?> theInterface : interfaces) {
-					if (theInterface.getName().contentEquals(interfaceClass.getName())) {
-						//this.getProfileAnnotation(theClass);
+					if (theInterface.getName().contentEquals(interfaceClass.getName()) &&
+							this.checkProfileAnnotation(theClass)) {
 						service = theClass;
 					}
 						
@@ -244,15 +245,13 @@ public class FWContext {
 		}
 	}
 	
-	private Annotation getProfileAnnotation(Object clazz) {
-		String key= this.getValueFromApplicationProperties("spring.profiles.active");
-		//String profile = this.profileClasses.get(key);
+	private boolean checkProfileAnnotation(Object clazz) {
 		for(Annotation annotation: clazz.getClass().getAnnotations()) {
-			if(annotation.annotationType().getSimpleName().indexOf(key) >= 0) {
-				System.out.println(1111);
-				return null;
+			if(annotation.annotationType().getSimpleName().equals(Profile.class.getSimpleName()) &&
+			   annotation.toString().indexOf(profile) >= 0) {
+				return true;
 			}
 		}
-		return null;
+		return false;
 	}
 }
