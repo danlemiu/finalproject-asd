@@ -6,13 +6,16 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,7 +121,7 @@ public class FWContext {
 						field.set(theTestClass, value);
 					}
 				}
-				// find all methods annotated with the @Test annotation
+				// find all methods annotated with the @Autowired annotation
 				for (Method method : theTestClass.getClass().getDeclaredMethods()) {
 					if (method.isAnnotationPresent(Autowired.class)) {
 						List<Object> objectParams = new ArrayList<Object>();
@@ -127,6 +130,9 @@ public class FWContext {
 							objectParams.add(instance);
 						}
 						method.invoke(theTestClass, objectParams.toArray());
+					}
+					if (method.isAnnotationPresent(Scheduled.class)) {
+						this.createScheduling(method, theTestClass);
 					}
 				}
 
@@ -253,5 +259,26 @@ public class FWContext {
 			}
 		}
 		return false;
+	}
+	
+	private void createScheduling(Method method, Object object) {
+		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+
+		// then, when you want to schedule a task
+		Runnable task = new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					method.invoke(object);
+				} catch (IllegalAccessException e) {
+					return;
+				} catch (InvocationTargetException e) {
+					return;
+				}
+			}
+		};   
+		
+		ScheduledFuture<?> result = executor.scheduleWithFixedDelay(task, 0, 1, TimeUnit.SECONDS);
 	}
 }
