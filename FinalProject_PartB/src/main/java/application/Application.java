@@ -13,6 +13,9 @@ public class Application implements Runnable {
 	@Autowired
 	IMyCategoryService myCategoryService;
 
+	@Autowired
+	IMyTransactionService myTransactionService;
+
 	
 	public static void main(String[] args) {
 		FWApplication.run(Application.class, args);
@@ -22,6 +25,7 @@ public class Application implements Runnable {
 	public void run() {
 		System.out.println("Application started!");
 		myCategoryService.addCategory();
+		myTransactionService.addTransaction();
 		
 	}
 
