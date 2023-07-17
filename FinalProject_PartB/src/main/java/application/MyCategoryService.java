@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.FinalProject.Category;
 import com.custom.aop.Qualifier;
+import com.custom.aop.Scheduled;
 
 @Service
 public class MyCategoryService implements IMyCategoryService {
@@ -16,6 +17,11 @@ public class MyCategoryService implements IMyCategoryService {
     public void addCategory(){
         Category category = new Category(111, "insurance");
         myCategoryDAO.save(category);
+    }
+    
+    @Scheduled(fixedRate=5000)
+    public void sendMessage() {
+    	System.out.println("Send message Scheduling!");
     }
 
 }

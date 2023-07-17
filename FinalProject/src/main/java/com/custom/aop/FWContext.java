@@ -194,7 +194,7 @@ public class FWContext {
 		return service;
 	}
 
-	public void start() {
+	public void startAspect() {
 		try {
 			for (Object serviceClass : customServiceObjectMap) {
 				for (Method method : serviceClass.getClass().getDeclaredMethods()) {
@@ -204,14 +204,16 @@ public class FWContext {
 						break;
 					for (Method methodAspect : theTestClass.getClass().getDeclaredMethods()) {
 						if (methodAspect.isAnnotationPresent(Before.class)) {
-							methodAspect.invoke(theTestClass, "Test");
+							List<Object> params= getParamsAnnotation(methodAspect);
+							methodAspect.invoke(theTestClass, params.toArray());
 						}
 					}
 					// find the @Around method
 					boolean isAround = false;
 					for (Method methodAspect : theTestClass.getClass().getDeclaredMethods()) {
 						if (methodAspect.isAnnotationPresent(Around.class)) {
-							methodAspect.invoke(theTestClass, method, serviceClass, new Object[] { "Test" });
+							List<Object> params= getParamsAnnotation(methodAspect);
+							methodAspect.invoke(theTestClass, method, serviceClass, params.toArray());
 							isAround = true;
 						}
 					}
@@ -223,7 +225,8 @@ public class FWContext {
 					// find the @After method
 					for (Method methodAspect : theTestClass.getClass().getDeclaredMethods()) {
 						if (methodAspect.isAnnotationPresent(After.class)) {
-							methodAspect.invoke(theTestClass, "Test");
+							List<Object> params= getParamsAnnotation(methodAspect);
+							methodAspect.invoke(theTestClass, params.toArray());
 						}
 					}
 				}
