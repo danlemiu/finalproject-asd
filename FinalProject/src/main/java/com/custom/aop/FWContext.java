@@ -8,14 +8,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.reflections.Reflections;
@@ -31,7 +30,6 @@ public class FWContext {
 	private static List<Object> serviceObjectMap = new ArrayList<>();
 	private static List<Object> repositoryObjectMap = new ArrayList<>();
 	private static String profile=null;
-	private ExecutorService executor = Executors.newFixedThreadPool(100);
 	
 	public FWContext(Object application) {
 		try {
@@ -41,7 +39,15 @@ public class FWContext {
 			// find and instantiate all classes annotated with the @Service annotation
 			Set<Class<?>> customServicetypes = reflections.getTypesAnnotatedWith(CustomService.class);
 			for (Class<?> serviceClass : customServicetypes) {
-				customServiceObjectMap.add((Object) serviceClass.newInstance());
+				Object instance = (Object) serviceClass.newInstance();
+				
+				Class<?>[] interfaces= serviceClass.getInterfaces();
+				for(Class<?> in: interfaces) {
+					Object instanceProxy= Proxy.newProxyInstance(in.getClassLoader(), 
+                            new Class[] { in },
+                            new StopWatchProxy(instance));
+					customServiceObjectMap.add(instanceProxy);
+				}
 			}
 
 			// find and instantiate all classes annotated with the @Service annotation
@@ -169,6 +175,26 @@ public class FWContext {
 				}
 			}
 			for (Object theClass : repositoryObjectMap) {
+				Class<?>[] interfaces = theClass.getClass().getInterfaces();
+				for (Class<?> theInterface : interfaces) {
+					if (theInterface.getName().contentEquals(interfaceClass.getName())) {
+						if(theClass.getClass().isAnnotationPresent(Profile.class) &&
+								this.checkProfileAnnotation(theClass)) {
+							return theClass;
+						} else {
+							if(qualifier != null && theClass.getClass().getSimpleName().equalsIgnoreCase(qualifier)) {
+								return theClass;
+							} else {
+								service = theClass;
+							}
+							
+						}
+						
+					}
+						
+				}
+			}
+			for (Object theClass : customServiceObjectMap) {
 				Class<?>[] interfaces = theClass.getClass().getInterfaces();
 				for (Class<?> theInterface : interfaces) {
 					if (theInterface.getName().contentEquals(interfaceClass.getName())) {

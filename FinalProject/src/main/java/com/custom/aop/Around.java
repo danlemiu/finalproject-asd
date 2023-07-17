@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Around {
 
-	String value() default "";
+	String pointcut() default "";
 }

@@ -1,4 +1,4 @@
-package com.FinalProject;
+package application;
 
 import java.lang.reflect.Method;
 
@@ -10,16 +10,16 @@ import com.custom.aop.Before;
 import com.custom.aop.CustomAspect;
 
 @CustomAspect
-public class TestAspect {
+public class SendMessageAspect {
 
-	@After(pointcut="TestService.testMessage")
-	public void sendMessage(String message) {
-		System.out.println("Aspect After Send message via Test Service: " + message);
+	@After(pointcut="IAOPService.sendMessage")
+	public void sendMessageAfter() {
+		System.out.println("Aspect After Send message via AOP Service");
 	}
 	
-	@Before(pointcut="TestService.testMessage")
-	public void sendMessageBefore(String message) {
-		System.out.println("Aspect Before Send message via Test Service: " + message);
+	@Before(pointcut="IAOPService.sendMessage")
+	public void sendMessageBefore() {
+		System.out.println("Aspect Before Send message via AOP Service");
 	}
 	
 	@Around("execution (* customers..CustomerDAO*.*(..))")

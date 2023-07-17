@@ -28,23 +28,19 @@ public class ApplicationPublishEvent implements IApplicationEventPublisher {
 		for(Class<?> clazz: servicetypes) {
 			for (Method method : clazz.getDeclaredMethods()) {
 				if (method.isAnnotationPresent(EventListener.class)) {
-					for(Class<?> clazzType: method.getParameterTypes()) {
-						Object instance;
-						try {
-							instance = (Object)clazz.newInstance();
-							if(method.isAnnotationPresent(Async.class)) {
-								this.createAsyncThread(method, event, instance);
-							}
-						} catch (InstantiationException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (IllegalAccessException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+					Object instance;
+					try {
+						instance = (Object)clazz.newInstance();
+						if(method.isAnnotationPresent(Async.class)) {
+							this.createAsyncThread(method, event, instance);
 						}
-						
-					}
-					
+					} catch (InstantiationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IllegalAccessException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}					
 				}
 			}
 		}
